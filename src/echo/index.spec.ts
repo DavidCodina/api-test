@@ -6,6 +6,6 @@ import { describe, expect, test /*, it */ } from 'vitest'
 describe('The echo() function...', () => {
   test("should return 'Hello'.", () => {
     const value = echo('Hello')
-    expect(value).toBe('Hullo')
+    expect(value).toBe('Hello')
   })
 })
