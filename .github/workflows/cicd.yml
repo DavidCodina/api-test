@@ -5,11 +5,12 @@ name: Lint, Test, Deploy
 on:
   # https://docs.github.com/en/actions/using-workflows
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
   pull_request:
     branches:
       - main
       - development
-
+  workflow_dispatch:
 jobs:
   lint: # The name of job is arbitrary.
     # The actual name used here is important because it allows us to search for
@@ -20,7 +21,6 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-
     steps:
       # https://github.com/marketplace/actions/checkout
       # https://github.com/actions/checkout
@@ -42,7 +42,6 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -67,7 +66,6 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
