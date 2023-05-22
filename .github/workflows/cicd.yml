@@ -10,7 +10,7 @@ on:
     branches:
       - main
       - development
-  workflow_dispatch:
+  # workflow_dispatch:
 jobs:
   lint: # The name of job is arbitrary.
     # The actual name used here is important because it allows us to search for
