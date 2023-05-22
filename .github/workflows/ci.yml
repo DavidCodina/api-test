@@ -11,7 +11,7 @@ on:
       - development
 
 jobs:
-  build: # The name of job is arbitrary.
+  build: # The name of job is arbitrary. It should probably be test instead.
     # The actual name used here is important because it allows us to search for
     # the correct status check when Requiring status checks to pass before merging.
     # This is set up in GitHub branch --> Settings --> Branches.
@@ -37,8 +37,12 @@ jobs:
         run: npm run lint
       - name: Run Tests
         run: npm test
-
+  # By default, jobs run in parallel, while steps run sequentially.
+  # Thus you really don't want the deploy job to run as a
+  # parallel job to the testing job. You could fix this by making
+  # the deploy a step. Conversely, you could use the 'needs' keyword.
   deploy:
+    needs: build # Can use brackets to wait for multiple jobs to finish [build, ... ]
     name: Deploy
     runs-on: ubuntu-latest
     strategy:
