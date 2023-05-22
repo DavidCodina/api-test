@@ -92,6 +92,12 @@ jobs:
         run: npm ci
       - name: Build Project
         run: npm run build
+        # https://www.udemy.com/course/github-actions-the-complete-guide/learn/lecture/34139932#overview
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-files
+          path: dist
 
   deploy:
     needs: build
