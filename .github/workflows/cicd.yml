@@ -130,7 +130,11 @@ jobs:
           name: dist # Corresponds to the upload name
       - name: List dist artifact contents (test)
         run: ls
-        # run: echo "Deploying to AWS Beanstalk..."
-        # https://docs.github.com/en/actions/learn-github-actions/contexts
+  bonus:
+    needs: deploy
+    name: Bonus
+    runs-on: ubuntu-latest
+    steps:
+      # https://docs.github.com/en/actions/learn-github-actions/contexts
       - name: Bonus -  output context of github
         run: echo "${{ toJSON(github) }}"
