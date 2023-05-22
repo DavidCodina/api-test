@@ -96,7 +96,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: dist-files
+          name: dist # dist-files
           path: dist
 
   deploy:
@@ -105,7 +105,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to AWS Beanstalk
-        run: echo "Deploying to AWS Beanstalk..."
+        uses: actions/download-artifact@v3
+        with:
+          name: dist # Corresponds to the upload name
+      - name: Output Contents (Test)
+        run: ls
+        # run: echo "Deploying to AWS Beanstalk..."
         # https://docs.github.com/en/actions/learn-github-actions/contexts
       - name: Bonus -  output context of github
         run: echo "${{ toJSON(github) }}"
