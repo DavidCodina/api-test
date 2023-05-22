@@ -1,5 +1,5 @@
 # The name of this file can be anyting but needs to be .yml
-name: Lint, Test, Build, Deploy
+name: Build, Lint, Test, Deploy
 
 # Whenever someone pushes to branch main then run the following job.
 on:
@@ -28,6 +28,36 @@ on:
       - dev
   workflow_dispatch:
 jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      ## Cache dependencies:
+      # https://www.udemy.com/course/github-actions-the-complete-guide/learn/lecture/34139976#overview
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: node_modules-${{ hashFiles('**/package-lock.json') }}
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build Project
+        run: npm run build
+        # https://www.udemy.com/course/github-actions-the-complete-guide/learn/lecture/34139932#overview
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist # dist-files
+          path: dist
+
   lint: # The name of job is arbitrary.
     # The actual name used here is important because it allows us to search for
     # the correct status check when Requiring status checks to pass before merging.
@@ -45,10 +75,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      ## Cache dependencies:
+      # https://www.udemy.com/course/github-actions-the-complete-guide/learn/lecture/34139976#overview
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: node_modules-${{ hashFiles('**/package-lock.json') }}
       - name: Install Dependencies
         run: npm ci
-      # - name: Build Project
-      #   run: npm run build
       - name: Lint src
         run: npm run lint
 
@@ -64,44 +99,27 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      ## Cache dependencies:
+      # https://www.udemy.com/course/github-actions-the-complete-guide/learn/lecture/34139976#overview
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: node_modules-${{ hashFiles('**/package-lock.json') }}
       - name: Install Dependencies
         run: npm ci
-      # - name: Build Project
-      #   run: npm run build
       - name: Run Tests
         run: npm test
 
-  ## I could put the build step first, then use it in lint, test and deploy...
-  # By default, jobs run in parallel, while steps run sequentially.
-  # Thus you really don't want the deploy job to run as a
-  # parallel job to the testing job. You could fix this by making
-  # the deploy a step. Conversely, you could use the 'needs' keyword.
-  build:
-    needs: [lint, test]
-    name: Build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install Dependencies
-        run: npm ci
-      - name: Build Project
-        run: npm run build
-        # https://www.udemy.com/course/github-actions-the-complete-guide/learn/lecture/34139932#overview
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist # dist-files
-          path: dist
-
   deploy:
-    needs: build
+    # By default, jobs run in parallel, while steps run sequentially.
+    # Thus you really don't want the deploy job to run as a
+    # parallel job to the testing job. You could fix this by making
+    # the deploy a step. Conversely, you could use the 'needs' keyword.
+    #
+    # Here I only truly need build, but also dont' want this
+    # to deploy unless lint and test are successful.
+    needs: [build, lint, test]
     name: Deploy
     runs-on: ubuntu-latest
     steps:
