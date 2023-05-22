@@ -45,10 +45,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install Dependencies
-        run: npm ci
-      - name: Build Project
-        run: npm run build
+      # - name: Install Dependencies
+      #   run: npm ci
+      # - name: Build Project
+      #   run: npm run build
       - name: Lint src
         run: npm run lint
 
@@ -64,13 +64,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install Dependencies
-        run: npm ci
-      - name: Build Project
-        run: npm run build
+      # - name: Install Dependencies
+      #   run: npm ci
+      # - name: Build Project
+      #   run: npm run build
       - name: Run Tests
         run: npm test
 
+  ## I could put the build step first, then use it in lint, test and deploy...
   # By default, jobs run in parallel, while steps run sequentially.
   # Thus you really don't want the deploy job to run as a
   # parallel job to the testing job. You could fix this by making
@@ -108,7 +109,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: dist # Corresponds to the upload name
-      - name: Output Contents (Test)
+      - name: List dist artifact contents (test)
         run: ls
         # run: echo "Deploying to AWS Beanstalk..."
         # https://docs.github.com/en/actions/learn-github-actions/contexts
