@@ -11,11 +11,11 @@ on:
       - development
 
 jobs:
-  build: # The name of job is arbitrary. It should probably be test instead.
+  lint: # The name of job is arbitrary.
     # The actual name used here is important because it allows us to search for
     # the correct status check when Requiring status checks to pass before merging.
     # This is set up in GitHub branch --> Settings --> Branches.
-    name: Build, Lint, and Test
+    name: Lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -35,14 +35,33 @@ jobs:
         run: npm run build --if-present
       - name: Lint src
         run: npm run lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build Project
+        run: npm run build --if-present
       - name: Run Tests
         run: npm test
+
   # By default, jobs run in parallel, while steps run sequentially.
   # Thus you really don't want the deploy job to run as a
   # parallel job to the testing job. You could fix this by making
   # the deploy a step. Conversely, you could use the 'needs' keyword.
   deploy:
-    needs: build # Can use brackets to wait for multiple jobs to finish [build, ... ]
+    needs: [lint, test]
     name: Deploy
     runs-on: ubuntu-latest
     strategy:
