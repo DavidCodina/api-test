@@ -9,7 +9,8 @@
     "test": "vitest",
     "test:verbose": "vitest --reporter verbose",
     "test:run": "vitest --run",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
   },
   "dependencies": {
     "cookie-parser": "^1.4.6",
