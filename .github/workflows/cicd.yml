@@ -40,7 +40,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      ## Cache dependencies:
+      # Cache dependencies. Must be done in all jobs that install dependencies.
+      # This seems to speed up the process by about 20s.
       # https://www.udemy.com/course/github-actions-the-complete-guide/learn/lecture/34139976#overview
       - name: Cache Dependencies
         uses: actions/cache@v3
@@ -75,8 +76,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      ## Cache dependencies:
-      # https://www.udemy.com/course/github-actions-the-complete-guide/learn/lecture/34139976#overview
       - name: Cache Dependencies
         uses: actions/cache@v3
         with:
@@ -99,8 +98,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      ## Cache dependencies:
-      # https://www.udemy.com/course/github-actions-the-complete-guide/learn/lecture/34139976#overview
       - name: Cache Dependencies
         uses: actions/cache@v3
         with:
@@ -112,6 +109,8 @@ jobs:
         run: npm test
 
   deploy:
+    #--------------------------------------------------------------------------
+    #
     # By default, jobs run in parallel, while steps run sequentially.
     # Thus you really don't want the deploy job to run as a
     # parallel job to the testing job. You could fix this by making
@@ -119,6 +118,8 @@ jobs:
     #
     # Here I only truly need build, but also dont' want this
     # to deploy unless lint and test are successful.
+    #
+    #--------------------------------------------------------------------------
     needs: [build, lint, test]
     name: Deploy
     runs-on: ubuntu-latest
