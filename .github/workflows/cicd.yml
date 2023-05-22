@@ -1,0 +1,85 @@
+# The name of this file can be anyting but needs to be .yml
+name: Lint, Test, Deploy
+
+# Whenever someone pushes to branch main then run the following job.
+on:
+  # https://docs.github.com/en/actions/using-workflows
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+  pull_request:
+    branches:
+      - main
+      - development
+
+jobs:
+  lint: # The name of job is arbitrary.
+    # The actual name used here is important because it allows us to search for
+    # the correct status check when Requiring status checks to pass before merging.
+    # This is set up in GitHub branch --> Settings --> Branches.
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      # https://github.com/marketplace/actions/checkout
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build Project
+        run: npm run build --if-present
+      - name: Lint src
+        run: npm run lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build Project
+        run: npm run build --if-present
+      - name: Run Tests
+        run: npm test
+
+  # By default, jobs run in parallel, while steps run sequentially.
+  # Thus you really don't want the deploy job to run as a
+  # parallel job to the testing job. You could fix this by making
+  # the deploy a step. Conversely, you could use the 'needs' keyword.
+  deploy:
+    needs: [lint, test]
+    name: Deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build Project
+        run: npm run build --if-present
+      - name: Upload to AWS Beanstalk
+        run: echo "Deploying..."
+        # https://docs.github.com/en/actions/learn-github-actions/contexts
+      - name: Bonus -  output context of github
+        run: echo "${{ toJSON(github) }}"

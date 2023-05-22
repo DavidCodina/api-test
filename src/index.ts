@@ -8,8 +8,8 @@ import testRoutes from './routes/testRoutes'
 dotenv.config()
 const app = express()
 
-const message = 'Whuddup!'
-console.log(message)
+// let message = 'Whuddup!!!'
+// console.log(message)
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -103,7 +103,7 @@ app.get('/', (req, res) => {
   const body = req.body || {}
 
   return res.status(200).json({
-    message: 'CI Test 3 (NO CI)',
+    message: 'CI Test',
     envTest: process.env.TEST,
     body: body
   })

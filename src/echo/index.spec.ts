@@ -4,8 +4,8 @@ import { echo } from './index'
 import { describe, expect, test /*, it */ } from 'vitest'
 
 describe('The echo() function...', () => {
-  test("should return 'Hello'.", () => {
-    const value = echo('Hello')
-    expect(value).toBe('Hello')
+  test("should return 'Hi'.", () => {
+    const value = echo('Hi')
+    expect(value).toBe('Hi')
   })
 })
