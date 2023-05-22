@@ -1,5 +1,5 @@
 # The name of this file can be anyting but needs to be .yml
-name: ESLint Test
+name: Lint, Test, Deploy
 
 # Whenever someone pushes to branch main then run the following job.
 on:
